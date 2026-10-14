@@ -36,12 +36,12 @@
     "test:fs-ops": "tsx scripts/test-fs-ops.ts"
   },
   "dependencies": {
-    "@anthropic-ai/claude-agent-sdk": "0.3.258",
+    "@anthropic-ai/claude-agent-sdk": "0.3.287",
     "@anthropic-ai/sdk": "0.97.1",
     "@grammyjs/runner": "2.0.3",
     "@grammyjs/transformer-throttler": "1.2.1",
     "@modelcontextprotocol/sdk": "1.29.0",
-    "@openai/codex": "0.145.0",
+    "@openai/codex": "0.160.0",
     "@types/luxon": "3.7.1",
     "@whiskeysockets/baileys": "6.7.23",
     "better-sqlite3": "12.6.2",

@@ -49,12 +49,31 @@ function ensureDorabotDir(): void {
  * Find the codex binary — prefer the SDK's bundled binary, fall back to global.
  */
 function findCodexBinary(): string {
-  if (process.env.CODEX_BINARY) return process.env.CODEX_BINARY;
+    if (process.env.CODEX_BINARY) return process.env.CODEX_BINARY;
 
-  const localBin = join(projectRoot(), 'node_modules', '.bin', process.platform === 'win32' ? 'codex.cmd' : 'codex');
-  if (existsSync(localBin)) return localBin;
+    // Finder/Dock launches may not have Node on PATH. Prefer the native
+    // executable shipped by the platform package over the npm JS wrapper.
+    const platforms: Record<string, [string, string]> = {
+        'darwin-arm64': ['codex-darwin-arm64', 'aarch64-apple-darwin'],
+        'darwin-x64': ['codex-darwin-x64', 'x86_64-apple-darwin'],
+        'linux-arm64': ['codex-linux-arm64', 'aarch64-unknown-linux-musl'],
+        'linux-x64': ['codex-linux-x64', 'x86_64-unknown-linux-musl'],
+        'win32-arm64': ['codex-win32-arm64', 'aarch64-pc-windows-msvc'],
+        'win32-x64': ['codex-win32-x64', 'x86_64-pc-windows-msvc'],
+    };
+    const target = platforms[`${process.platform}-${process.arch}`];
+    if (target) {
+        const [pkg, triple] = target;
+        const executable = process.platform === 'win32' ? 'codex.exe' : 'codex';
+        for (const packageDir of [pkg, 'codex']) {
+            const nativeBin = join(projectRoot(), 'node_modules', '@openai', packageDir, 'vendor', triple, 'bin', executable);
+            if (existsSync(nativeBin)) return nativeBin;
+        }
+    }
 
-  return 'codex';
+    const localBin = join(projectRoot(), 'node_modules', '.bin', process.platform === 'win32' ? 'codex.cmd' : 'codex');
+    if (existsSync(localBin)) return localBin;
+    return 'codex';
 }
 
 const codexBinary = findCodexBinary();
